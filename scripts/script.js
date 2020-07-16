@@ -6,11 +6,31 @@ const Dummy_Data = [
 
 const container = d3.select("svg").classed("container", true);
 
-container
-	.selectAll(".bar")
-	.data(Dummy_Data)
-	.enter()
-	.append("rect")
-	.classed("bar", true)
-	.attr("width", 50)
-	.attr("height", (data) => data.value * 15);
+const render = (data) => {
+	const xScale = d3
+		.scaleLinear()
+		.domain([0, d3.max(data, (d) => d.new_cases)])
+		.range([0, 250]);
+	const yScale = d3
+		.scaleBand()
+		.domain(data.map((d) => d.date))
+		.range([0, 250]);
+	const bars = container
+		.selectAll(".bar")
+		.data(data)
+		.enter()
+		.append("rect")
+		.classed("bar", true)
+		.attr("width", (d) => xScale(d.new_cases))
+		.attr("height", (data = yScale.bandwidth()))
+		.attr("y", (data) => yScale(data.date));
+};
+
+d3.csv("../test.csv").then((data) => {
+	data.forEach((d) => {
+		d.new_cases = +d.new_cases;
+		d.total_cases = +d.total_cases;
+	});
+	render(data);
+	console.log(data);
+});
