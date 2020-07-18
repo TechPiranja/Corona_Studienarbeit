@@ -7,3 +7,7 @@
 .bar {
 	fill: #68157c;
 }
+
+.sliderContainer input {
+	width: 500px;
+}
