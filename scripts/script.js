@@ -1,10 +1,22 @@
+const covidStart = new Date("2019-12-31");
+var dateMax = new Date();
+var diffDays = 0;
 window.onload = function setTimeSlider() {
 	let today = new Date();
 	today = today.getMonth() + 1 + "/" + today.getDate() + "/" + today.getFullYear();
-	diffDays = date_diff_indays("12/31/2019", today);
+	diffDays = date_diff_indays("2019-12-31", today);
 	document.getElementById("timeSlider").max = diffDays;
 	console.log(diffDays);
+
+	dateMax = new Date(covidStart.getTime() + parseInt(diffDays) * 86400000);
+	console.log(dateMax);
 };
+
+function addDays(date, days) {
+	const copy = new Date(Number(date));
+	copy.setDate(date.getDate() + days);
+	return copy;
+}
 
 var date_diff_indays = function (date1, date2) {
 	dt1 = new Date(date1);
@@ -17,7 +29,20 @@ var date_diff_indays = function (date1, date2) {
 };
 
 function changeTimeEnd(val) {
-	console.log(val);
+	//dateMax = addDays(covidStart, val).toJSON().slice(0, 10);
+	dateMax = new Date(covidStart.getTime() + parseInt(val) * 86400000);
+	dateMax.toJSON();
+	document.getElementById("simpleBarChart").innerHTML = "";
+	document.getElementById("dataviz").innerHTML = "";
+
+	let temp = csv_data;
+	//temp = temp.slice(0, val);
+	console.log(dateMax);
+	let temptest = temp.filter(function (d) {
+		return new Date(d.date) < dateMax;
+	});
+	console.log(temptest);
+	render(temptest);
 }
 
 const container = d3.select("#simpleBarChart").classed("container", true);
@@ -31,7 +56,7 @@ const render = (data) => {
 	const innerWidth = width - margin.left - margin.right;
 	const innerHeight = height - margin.top - margin.bottom;
 
-	const xScale = d3.scaleBand().domain(data.map(xValue)).range([0, innerWidth]).padding(0.1);
+	var xScale = d3.scaleBand().domain(data.map(xValue)).range([0, innerWidth]).padding(0.1);
 	var yScale = d3
 		.scaleLinear()
 		.domain([0, d3.max(data, yValue)])
@@ -66,6 +91,7 @@ const render = (data) => {
 		.scaleLinear()
 		.domain([0, d3.max(data, yValue)])
 		.range([innerHeight, 0]);
+
 	const dataviz = d3
 		.select("#dataviz")
 		.append("svg")
@@ -126,10 +152,12 @@ const render = (data) => {
 		});
 };
 
+var csv_data = {};
 d3.csv("../notebooks/test.csv").then((data) => {
 	data.forEach((d) => {
 		d.new_cases = +d.new_cases;
 	});
 	console.log(data);
+	csv_data = data;
 	render(data);
 });
