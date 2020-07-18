@@ -1,3 +1,25 @@
+window.onload = function setTimeSlider() {
+	let today = new Date();
+	today = today.getMonth() + 1 + "/" + today.getDate() + "/" + today.getFullYear();
+	diffDays = date_diff_indays("12/31/2019", today);
+	document.getElementById("timeSlider").max = diffDays;
+	console.log(diffDays);
+};
+
+var date_diff_indays = function (date1, date2) {
+	dt1 = new Date(date1);
+	dt2 = new Date(date2);
+	return Math.floor(
+		(Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) -
+			Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate())) /
+			(1000 * 60 * 60 * 24)
+	);
+};
+
+function changeTimeEnd(val) {
+	console.log(val);
+}
+
 const container = d3.select("#simpleBarChart").classed("container", true);
 
 const render = (data) => {
