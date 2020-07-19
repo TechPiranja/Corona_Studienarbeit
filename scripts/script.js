@@ -48,7 +48,7 @@ const render = (data) => {
 	const height = parseInt(container.style("height"));
 	var xValue = (d) => d.date;
 	var yValue = (d) => d.Country == "DEU" && d.new_cases;
-	const margin = { top: 20, right: 50, bottom: 40, left: 50 };
+	const margin = { top: 10, right: 40, bottom: 40, left: 60 };
 	const innerWidth = width - margin.left - margin.right;
 	const innerHeight = height - margin.top - margin.bottom;
 
@@ -59,15 +59,16 @@ const render = (data) => {
 		.range([innerHeight, 0]);
 	const g = container.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-	g.append("g").style("font", "15px times").call(d3.axisLeft(yScale));
+	g.append("g").attr("class", "axis").style("font", "15px times").call(d3.axisLeft(yScale));
 	g.append("g")
+		.attr("class", "axis")
 		.style("font", "15px times")
 		.attr("transform", `translate(0, ${innerHeight})`)
 		.call(
 			d3
 				.axisBottom(xScale)
 				.tickValues(
-					xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 4) === 0 || i == diffDays-1)
+					xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 4) === 0 || i == diffDays - 1)
 				)
 		);
 
@@ -105,6 +106,7 @@ const render = (data) => {
 	dataviz
 		.append("g")
 		.style("font", "15px times")
+		.attr("class", "axis")
 		.attr("transform", `translate(0, ${innerHeight})`)
 		.call(
 			d3
@@ -114,7 +116,7 @@ const render = (data) => {
 				)
 		);
 
-	dataviz.append("g").style("font", "15px times").call(d3.axisLeft(yScale));
+	dataviz.append("g").attr("class", "axis").style("font", "15px times").call(d3.axisLeft(yScale));
 
 	// color palette
 	var res = sumstat.map(function (d) {
