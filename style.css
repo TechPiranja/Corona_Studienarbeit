@@ -1,13 +1,28 @@
+body {
+	background-color: #242731;
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+}
+
 .container {
 	width: 1800px;
 	height: 450px;
-	border: 1px solid #68157c;
+	border: 1px solid #858585;
+	border-radius: 10px;
+	margin: 5px;
 }
 
 .bar {
-	fill: #68157c;
+	fill: #ac33cb;
 }
 
 .sliderContainer input {
 	width: 1800px;
+}
+
+text,
+h1,
+.axis {
+	color: rgb(198, 198, 198);
 }
