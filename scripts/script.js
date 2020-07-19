@@ -3,6 +3,8 @@ var dateMax = new Date();
 var originalDiffDays = 0;
 var diffDays = 0;
 var isPlaying = false;
+var interval;
+var playStopElement = document.getElementById("playStop");
 
 window.onload = function setTimeSlider() {
 	let today = new Date();
@@ -20,8 +22,6 @@ function addDays(date, days) {
 	return copy;
 }
 
-var interval;
-
 function playStopDateAnimation() {
 	if (!togglePlayStopIcon()) return;
 
@@ -34,20 +34,19 @@ function playStopDateAnimation() {
 			i++;
 		}
 		if (i == originalDiffDays) clearInterval();
-		console.log(originalDiffDays);
 	}, 80);
 }
 
 function togglePlayStopIcon(defaultState = false) {
 	if (isPlaying || defaultState) {
-		document.getElementById("playStop").classList.remove("fa-pause");
-		document.getElementById("playStop").classList.add("fa-play");
+		playStopElement.classList.remove("fa-pause");
+		playStopElement.classList.add("fa-play");
 		isPlaying = false;
 		clearInterval(interval);
 		return false;
 	} else {
-		document.getElementById("playStop").classList.remove("fa-play");
-		document.getElementById("playStop").classList.add("fa-pause");
+		playStopElement.classList.remove("fa-play");
+		playStopElement.classList.add("fa-pause");
 		isPlaying = true;
 	}
 	return true;
@@ -70,7 +69,6 @@ function changeTimeEnd(val) {
 	document.getElementById("dataviz").innerHTML = "";
 
 	let temp = csv_data;
-	console.log(dateMax);
 	temp = temp.filter(function (d) {
 		return new Date(d.date) < dateMax;
 	});
@@ -196,7 +194,6 @@ d3.csv("../notebooks/test.csv").then((data) => {
 	data.forEach((d) => {
 		d.new_cases = +d.new_cases;
 	});
-	console.log(data);
 	csv_data = data;
 	render(data);
 });
