@@ -29,6 +29,7 @@ var date_diff_indays = function (date1, date2) {
 
 function changeTimeEnd(val) {
 	dateMax = new Date(covidStart.getTime() + parseInt(val) * 86400000);
+	diffDays = date_diff_indays("2019-12-31", dateMax);
 	document.getElementById("simpleBarChart").innerHTML = "";
 	document.getElementById("dataviz").innerHTML = "";
 
@@ -66,7 +67,7 @@ const render = (data) => {
 			d3
 				.axisBottom(xScale)
 				.tickValues(
-					xScale.domain().filter((d, i) => i % d3.format(".1")(data.length / 4) === 0 || i == data.length - 1)
+					xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 4) === 0 || i == diffDays-1)
 				)
 		);
 
@@ -109,7 +110,7 @@ const render = (data) => {
 			d3
 				.axisBottom(xScale)
 				.tickValues(
-					xScale.domain().filter((d, i) => i % d3.format(".1")(data.length / 4) === 0 || i == data.length - 1)
+					xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 4) === 0 || i == diffDays - 1)
 				)
 		);
 
