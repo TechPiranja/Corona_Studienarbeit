@@ -7,6 +7,7 @@ window.onload = function setTimeSlider() {
 	today = today.getMonth() + 1 + "/" + today.getDate() + "/" + today.getFullYear();
 	diffDays = date_diff_indays("2019-12-31", today);
 	document.getElementById("timeSlider").max = diffDays;
+	document.getElementById("timeSlider").value = diffDays;
 	dateMax = new Date(covidStart.getTime() + parseInt(diffDays) * 86400000);
 };
 
