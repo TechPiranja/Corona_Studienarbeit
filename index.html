@@ -5,13 +5,17 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Corona-Studienarbeit</title>
 		<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+		<link href="./node_modules/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
 	</head>
 	<body>
 		<h1>Corona-Studienarbeit</h1>
 		<svg id="simpleBarChart"></svg>
 		<div id="dataviz"></div>
 		<div class="sliderContainer">
+			<button onclick="playDateAnimation()"><i class="fa fa-play" aria-hidden="true" style="font-size: 1.75em;"></i></button>
+			<p>Dez 31, 2019</p>
 			<input id="timeSlider" type="range" min="1" oninput="changeTimeEnd(this.value)" />
+			<p>Jul 19, 2020</p>
 		</div>
 		<script type="text/javascript" src="scripts/d3.min.js"></script>
 		<script type="text/javascript" src="scripts/script.js"></script>
