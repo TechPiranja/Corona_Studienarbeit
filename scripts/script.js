@@ -1,11 +1,14 @@
 const covidStart = new Date("2019-12-31");
 var dateMax = new Date();
+var originalDiffDays = 0;
 var diffDays = 0;
+var isPlaying = false;
 
 window.onload = function setTimeSlider() {
 	let today = new Date();
 	today = today.getMonth() + 1 + "/" + today.getDate() + "/" + today.getFullYear();
 	diffDays = date_diff_indays("2019-12-31", today);
+	originalDiffDays = diffDays;
 	document.getElementById("timeSlider").max = diffDays;
 	document.getElementById("timeSlider").value = diffDays;
 	dateMax = new Date(covidStart.getTime() + parseInt(diffDays) * 86400000);
@@ -15,6 +18,39 @@ function addDays(date, days) {
 	const copy = new Date(Number(date));
 	copy.setDate(date.getDate() + days);
 	return copy;
+}
+
+var interval;
+
+function playStopDateAnimation() {
+	if (!togglePlayStopIcon()) return;
+
+	currentVal = document.getElementById("timeSlider").value;
+	let i = currentVal < originalDiffDays ? currentVal : 1;
+	interval = setInterval(function () {
+		if (i <= originalDiffDays) {
+			document.getElementById("timeSlider").value = i;
+			changeTimeEnd(i);
+			i++;
+		}
+		if (i == originalDiffDays) clearInterval();
+		console.log(originalDiffDays);
+	}, 80);
+}
+
+function togglePlayStopIcon(defaultState = false) {
+	if (isPlaying || defaultState) {
+		document.getElementById("playStop").classList.remove("fa-pause");
+		document.getElementById("playStop").classList.add("fa-play");
+		isPlaying = false;
+		clearInterval(interval);
+		return false;
+	} else {
+		document.getElementById("playStop").classList.remove("fa-play");
+		document.getElementById("playStop").classList.add("fa-pause");
+		isPlaying = true;
+	}
+	return true;
 }
 
 var date_diff_indays = function (date1, date2) {
@@ -39,6 +75,11 @@ function changeTimeEnd(val) {
 		return new Date(d.date) < dateMax;
 	});
 	render(temp);
+}
+
+function triggerChangeTimeEnd(val) {
+	togglePlayStopIcon(true);
+	changeTimeEnd(val);
 }
 
 const container = d3.select("#simpleBarChart").classed("container", true);
