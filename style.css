@@ -17,12 +17,33 @@ body {
 	fill: #ac33cb;
 }
 
-.sliderContainer input {
-	width: 1800px;
+input {
+	width: 1550px;
 }
 
 text,
 h1,
+p,
 .axis {
 	color: rgb(198, 198, 198);
+}
+
+i {
+	color: rgb(230, 245, 60);
+}
+
+.sliderContainer {
+	width: 1800px;
+	display: flex;
+	flex-flow: row;
+	justify-content: space-between;
+}
+
+button {
+	background-color: Transparent;
+	background-repeat: no-repeat;
+	border: none;
+	cursor: pointer;
+	overflow: hidden;
+	outline: none;
 }
