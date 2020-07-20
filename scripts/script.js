@@ -104,7 +104,7 @@ function triggerChangeTimeEnd(val) {
 const container = d3.select("#simpleBarChart").classed("container", true);
 const width = parseInt(container.style("width"));
 const height = parseInt(container.style("height"));
-const margin = { top: 10, right: 40, bottom: 40, left: 60 };
+const margin = { top: 10, right: 80, bottom: 40, left: 60 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
 
@@ -126,6 +126,17 @@ function renderBarChart(data) {
 			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 9) === 0))
 		);
 
+	var tooltip = container.append("g").style("display", "none");
+	tooltip.append("rect").attr("width", 180).attr("height", 32).attr("class", "tooltip");
+
+	tooltip
+		.append("text")
+		.attr("x", 15)
+		.attr("dy", "1.2em")
+		.style("font-size", "1.25em")
+		.attr("font-weight", "bold")
+		.style("fill", "#bbb");
+
 	g.selectAll(".bar")
 		.data(data)
 		.enter()
@@ -134,7 +145,20 @@ function renderBarChart(data) {
 		.attr("width", xScale.bandwidth())
 		.attr("height", (d) => innerHeight - yScale(yValue(d)))
 		.attr("x", (d) => xScale(xValue(d)))
-		.attr("y", (d) => yScale(yValue(d)));
+		.attr("y", (d) => yScale(yValue(d)))
+		.on("mouseover", function () {
+			tooltip.style("display", null);
+		})
+		.on("mouseout", function () {
+			tooltip.style("display", "none");
+		})
+		.on("mousemove", function (d) {
+			var xPos = d3.mouse(this)[0] - 15;
+			var yPos = d3.mouse(this)[1] - 55;
+			console.log(yPos);
+			tooltip.attr("transform", `translate(${xPos}, ${yPos})`);
+			tooltip.select("text").text(d.date + " : " + d[selectedData]);
+		});
 }
 
 const render = (data, datavizId) => {
@@ -206,7 +230,7 @@ const render = (data, datavizId) => {
 				})(d.values);
 		});
 
-	dataviz.append("g").attr("transform", `translate(20,5)`).call(colorLegend, {
+	dataviz.append("g").attr("transform", `translate(1475,5)`).call(colorLegend, {
 		colorScale,
 		circleRadius: 5,
 		spacing: 15,
@@ -252,6 +276,7 @@ const colorLegend = (selection, props) => {
 		.attr("x", textOffset);
 };
 
+// Material UI Colors
 colors = [
 	"#ef5350",
 	"#ec407a",
