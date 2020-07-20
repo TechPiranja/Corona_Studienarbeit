@@ -8,7 +8,7 @@ var playStopElement = document.getElementById("playStop");
 
 window.onload = function setTimeSlider() {
 	let today = new Date();
-	today = today.getMonth() + 1 + "/" + today.getDate() + "/" + today.getFullYear();
+	today = today.getMonth() + 1 + "-" + today.getDate() + "-" + today.getFullYear();
 	diffDays = date_diff_indays("2019-12-31", today);
 	originalDiffDays = diffDays;
 	document.getElementById("timeSlider").max = diffDays;
@@ -109,7 +109,7 @@ const render = (data) => {
 			d3
 				.axisBottom(xScale)
 				.tickValues(
-					xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 4) === 0 || i == diffDays - 1)
+					xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 9) === 0)
 				)
 		);
 
@@ -153,7 +153,7 @@ const render = (data) => {
 			d3
 				.axisBottom(xScale)
 				.tickValues(
-					xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 4) === 0 || i == diffDays - 1)
+					xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 9) === 0)
 				)
 		);
 
