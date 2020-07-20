@@ -69,12 +69,24 @@ function changeTimeEnd(val) {
 	diffDays = date_diff_indays("2019-12-31", dateMax);
 	document.getElementById("simpleBarChart").innerHTML = "";
 	document.getElementById("dataviz").innerHTML = "";
-
-	let temp = csv_data;
-	temp = temp.filter(function (d) {
-		return new Date(d.date) < dateMax;
-	});
-	render(temp);
+	document.getElementById("dataviz2").innerHTML = "";
+	renderBarChart(
+		csv_data1.filter(function (d) {
+			return new Date(d.date) < dateMax;
+		})
+	);
+	render(
+		csv_data1.filter(function (d) {
+			return new Date(d.date) < dateMax;
+		}),
+		"#dataviz"
+	);
+	render(
+		csv_data2.filter(function (d) {
+			return new Date(d.date) < dateMax;
+		}),
+		"#dataviz2"
+	);
 }
 
 function triggerChangeTimeEnd(val) {
@@ -83,15 +95,15 @@ function triggerChangeTimeEnd(val) {
 }
 
 const container = d3.select("#simpleBarChart").classed("container", true);
+const width = parseInt(container.style("width"));
+const height = parseInt(container.style("height"));
+const margin = { top: 10, right: 40, bottom: 40, left: 60 };
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
 
-const render = (data) => {
-	const width = parseInt(container.style("width"));
-	const height = parseInt(container.style("height"));
+function renderBarChart(data) {
 	var xValue = (d) => d.date;
 	var yValue = (d) => d.Country == "DEU" && d.new_cases;
-	const margin = { top: 10, right: 40, bottom: 40, left: 60 };
-	const innerWidth = width - margin.left - margin.right;
-	const innerHeight = height - margin.top - margin.bottom;
 
 	var xScale = d3.scaleBand().domain(data.map(xValue)).range([0, innerWidth]).padding(0.1);
 	var yScale = d3
@@ -99,7 +111,6 @@ const render = (data) => {
 		.domain([0, d3.max(data, yValue)])
 		.range([innerHeight, 0]);
 	const g = container.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
-
 	g.append("g").attr("class", "axis").style("font", "15px times").call(d3.axisLeft(yScale));
 	g.append("g")
 		.attr("class", "axis")
@@ -118,7 +129,16 @@ const render = (data) => {
 		.attr("height", (d) => innerHeight - yScale(yValue(d)))
 		.attr("x", (d) => xScale(xValue(d)))
 		.attr("y", (d) => yScale(yValue(d)));
+}
 
+const render = (data, datavizId) => {
+	var xValue = (d) => d.date;
+	var yValue = (d) => d.new_cases;
+	var xScale = d3.scaleBand().domain(data.map(xValue)).range([0, innerWidth]).padding(0.1);
+	var yScale = d3
+		.scaleLinear()
+		.domain([0, d3.max(data, yValue)])
+		.range([innerHeight, 0]);
 	//------------ second visualization ------------
 	yValue = (d) => d.new_cases;
 	yScale = d3
@@ -127,7 +147,7 @@ const render = (data) => {
 		.range([innerHeight, 0]);
 
 	const dataviz = d3
-		.select("#dataviz")
+		.select(datavizId)
 		.append("svg")
 		.classed("container", true)
 		.append("g")
@@ -209,13 +229,23 @@ const render = (data) => {
 	});
 };
 
-var csv_data = {};
-d3.csv("../notebooks/test.csv").then((data) => {
+var csv_data1 = {};
+var csv_data2 = {};
+d3.csv("../notebooks/europe.csv").then((data) => {
 	data.forEach((d) => {
 		d.new_cases = +d.new_cases;
 	});
-	csv_data = data;
-	render(data);
+	csv_data1 = data;
+	renderBarChart(data);
+	render(data, "#dataviz");
+});
+
+d3.csv("../notebooks/asia.csv").then((data) => {
+	data.forEach((d) => {
+		d.new_cases = +d.new_cases;
+	});
+	csv_data2 = data;
+	render(data, "#dataviz2");
 });
 
 const colorLegend = (selection, props) => {
