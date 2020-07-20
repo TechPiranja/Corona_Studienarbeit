@@ -15,19 +15,12 @@ window.onload = function setTimeSlider() {
 	document.getElementById("timeSlider").max = diffDays;
 	document.getElementById("timeSlider").value = diffDays;
 	dateMax = new Date(covidStart.getTime() + parseInt(diffDays) * 86400000);
-
 	document.getElementById("todaysDate").innerHTML = today;
 };
 
 function changeData(selectedObject) {
 	selectedData = selectedObject.value;
 	reRenderCharts();
-}
-
-function addDays(date, days) {
-	const copy = new Date(Number(date));
-	copy.setDate(date.getDate() + days);
-	return copy;
 }
 
 function playStopDateAnimation() {
@@ -152,6 +145,7 @@ const render = (data, datavizId) => {
 		.scaleLinear()
 		.domain([0, d3.max(data, yValue)])
 		.range([innerHeight, 0]);
+
 	//------------ second visualization ------------
 	yValue = (d) => d[selectedData];
 	yScale = d3
@@ -188,29 +182,7 @@ const render = (data, datavizId) => {
 	var res = sumstat.map(function (d) {
 		return d.key;
 	}); // list of group names
-	var colorScale = d3
-		.scaleOrdinal()
-		.domain(res)
-		.range([
-			"#ef5350",
-			"#ec407a",
-			"#ab47bc",
-			"#7e57c2",
-			"#5c6bc0",
-			"#42a5f5",
-			"#29b6f6",
-			"#26c6da",
-			"#26a69a",
-			"#66bb6a",
-			"#9ccc65",
-			"#d4e157",
-			"#ffee58",
-			"#ffca28",
-			"#ffa726",
-			"#ff7043",
-			"#8d6e63",
-			"#78909c",
-		]);
+	var colorScale = d3.scaleOrdinal().domain(res).range(colors);
 
 	// Draw the line
 	dataviz
@@ -242,6 +214,7 @@ const render = (data, datavizId) => {
 	});
 };
 
+// loading data from .csv
 var csv_data1 = {};
 var csv_data2 = {};
 d3.csv("../notebooks/europe.csv").then((data) => {
@@ -265,14 +238,11 @@ d3.csv("../notebooks/asia.csv").then((data) => {
 
 const colorLegend = (selection, props) => {
 	const { colorScale, circleRadius, spacing, textOffset } = props;
-
 	const groups = selection.selectAll("g").data(colorScale.domain());
 	const groupsEnter = groups.enter().append("g").attr("class", "tick");
 	groupsEnter.merge(groups).attr("transform", (d, i) => `translate(0, ${i * spacing})`);
 	groups.exit().remove();
-
 	groupsEnter.append("circle").merge(groups.select("circle")).attr("r", circleRadius).attr("fill", colorScale);
-
 	groupsEnter
 		.append("text")
 		.style("fill", "rgb(198, 198, 198)")
@@ -281,3 +251,24 @@ const colorLegend = (selection, props) => {
 		.attr("dy", "0.32em")
 		.attr("x", textOffset);
 };
+
+colors = [
+	"#ef5350",
+	"#ec407a",
+	"#ab47bc",
+	"#7e57c2",
+	"#5c6bc0",
+	"#42a5f5",
+	"#29b6f6",
+	"#26c6da",
+	"#26a69a",
+	"#66bb6a",
+	"#9ccc65",
+	"#d4e157",
+	"#ffee58",
+	"#ffca28",
+	"#ffa726",
+	"#ff7043",
+	"#8d6e63",
+	"#78909c",
+];
