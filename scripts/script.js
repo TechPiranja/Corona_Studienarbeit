@@ -155,7 +155,6 @@ function renderBarChart(data) {
 		.on("mousemove", function (d) {
 			var xPos = d3.mouse(this)[0] - 15;
 			var yPos = d3.mouse(this)[1] - 55;
-			console.log(yPos);
 			tooltip.attr("transform", `translate(${xPos}, ${yPos})`);
 			tooltip.select("text").text(d.date + " : " + d[selectedData]);
 		});
