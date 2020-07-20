@@ -106,11 +106,7 @@ const render = (data) => {
 		.style("font", "15px times")
 		.attr("transform", `translate(0, ${innerHeight})`)
 		.call(
-			d3
-				.axisBottom(xScale)
-				.tickValues(
-					xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 9) === 0)
-				)
+			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 9) === 0))
 		);
 
 	g.selectAll(".bar")
@@ -150,11 +146,7 @@ const render = (data) => {
 		.attr("class", "axis")
 		.attr("transform", `translate(0, ${innerHeight})`)
 		.call(
-			d3
-				.axisBottom(xScale)
-				.tickValues(
-					xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 9) === 0)
-				)
+			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 9) === 0))
 		);
 
 	dataviz.append("g").attr("class", "axis").style("font", "15px times").call(d3.axisLeft(yScale));
@@ -166,7 +158,26 @@ const render = (data) => {
 	var colorScale = d3
 		.scaleOrdinal()
 		.domain(res)
-		.range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628", "#f781bf", "#999999"]);
+		.range([
+			"#ef5350",
+			"#ec407a",
+			"#ab47bc",
+			"#7e57c2",
+			"#5c6bc0",
+			"#42a5f5",
+			"#29b6f6",
+			"#26c6da",
+			"#26a69a",
+			"#66bb6a",
+			"#9ccc65",
+			"#d4e157",
+			"#ffee58",
+			"#ffca28",
+			"#ffa726",
+			"#ff7043",
+			"#8d6e63",
+			"#78909c",
+		]);
 
 	// Draw the line
 	dataviz
