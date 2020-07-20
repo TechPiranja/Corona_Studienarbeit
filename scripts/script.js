@@ -14,6 +14,8 @@ window.onload = function setTimeSlider() {
 	document.getElementById("timeSlider").max = diffDays;
 	document.getElementById("timeSlider").value = diffDays;
 	dateMax = new Date(covidStart.getTime() + parseInt(diffDays) * 86400000);
+
+	document.getElementById("todaysDate").innerHTML = today;
 };
 
 function addDays(date, days) {
@@ -161,7 +163,7 @@ const render = (data) => {
 	var res = sumstat.map(function (d) {
 		return d.key;
 	}); // list of group names
-	var color = d3
+	var colorScale = d3
 		.scaleOrdinal()
 		.domain(res)
 		.range(["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628", "#f781bf", "#999999"]);
@@ -174,7 +176,7 @@ const render = (data) => {
 		.append("path")
 		.attr("fill", "none")
 		.attr("stroke", function (d) {
-			return color(d.key);
+			return colorScale(d.key);
 		})
 		.attr("stroke-width", 1)
 		.attr("d", function (d) {
@@ -187,6 +189,13 @@ const render = (data) => {
 					return yScale(d.new_cases);
 				})(d.values);
 		});
+
+	dataviz.append("g").attr("transform", `translate(20,10)`).call(colorLegend, {
+		colorScale,
+		circleRadius: 5,
+		spacing: 15,
+		textOffset: 20,
+	});
 };
 
 var csv_data = {};
@@ -197,3 +206,22 @@ d3.csv("../notebooks/test.csv").then((data) => {
 	csv_data = data;
 	render(data);
 });
+
+const colorLegend = (selection, props) => {
+	const { colorScale, circleRadius, spacing, textOffset } = props;
+
+	const groups = selection.selectAll("g").data(colorScale.domain());
+	const groupsEnter = groups.enter().append("g").attr("class", "tick");
+	groupsEnter.merge(groups).attr("transform", (d, i) => `translate(0, ${i * spacing})`);
+	groups.exit().remove();
+
+	groupsEnter.append("circle").merge(groups.select("circle")).attr("r", circleRadius).attr("fill", colorScale);
+
+	groupsEnter
+		.append("text")
+		.style("fill", "rgb(198, 198, 198)")
+		.merge(groups.select("text"))
+		.text((d) => d)
+		.attr("dy", "0.32em")
+		.attr("x", textOffset);
+};
