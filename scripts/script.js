@@ -234,7 +234,7 @@ const render = (data, datavizId) => {
 				})(d.values);
 		});
 
-	dataviz.append("g").attr("transform", `translate(20,10)`).call(colorLegend, {
+	dataviz.append("g").attr("transform", `translate(20,5)`).call(colorLegend, {
 		colorScale,
 		circleRadius: 5,
 		spacing: 15,
