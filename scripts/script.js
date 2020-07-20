@@ -5,6 +5,7 @@ var diffDays = 0;
 var isPlaying = false;
 var interval;
 var playStopElement = document.getElementById("playStop");
+var selectedData = "new_cases";
 
 window.onload = function setTimeSlider() {
 	let today = new Date();
@@ -17,6 +18,11 @@ window.onload = function setTimeSlider() {
 
 	document.getElementById("todaysDate").innerHTML = today;
 };
+
+function changeData(selectedObject) {
+	selectedData = selectedObject.value;
+	reRenderCharts();
+}
 
 function addDays(date, days) {
 	const copy = new Date(Number(date));
@@ -65,25 +71,33 @@ var date_diff_indays = function (date1, date2) {
 };
 
 function changeTimeEnd(val) {
+	// neues Enddatum berechnen
 	dateMax = new Date(covidStart.getTime() + parseInt(val) * 86400000);
+	// ändern des diffDays, da die x-Achse damit skaliert
 	diffDays = date_diff_indays("2019-12-31", dateMax);
+	reRenderCharts();
+}
+
+function reRenderCharts() {
+	// löschen der alten Diagramme
 	document.getElementById("simpleBarChart").innerHTML = "";
 	document.getElementById("dataviz").innerHTML = "";
 	document.getElementById("dataviz2").innerHTML = "";
+	// new rendern der neuen Diagramme
 	renderBarChart(
 		csv_data1.filter(function (d) {
-			return new Date(d.date) < dateMax;
+			return new Date(d.date) <= dateMax;
 		})
 	);
 	render(
 		csv_data1.filter(function (d) {
-			return new Date(d.date) < dateMax;
+			return new Date(d.date) <= dateMax;
 		}),
 		"#dataviz"
 	);
 	render(
 		csv_data2.filter(function (d) {
-			return new Date(d.date) < dateMax;
+			return new Date(d.date) <= dateMax;
 		}),
 		"#dataviz2"
 	);
@@ -103,18 +117,17 @@ const innerHeight = height - margin.top - margin.bottom;
 
 function renderBarChart(data) {
 	var xValue = (d) => d.date;
-	var yValue = (d) => d.Country == "DEU" && d.new_cases;
-
+	var yValue = (d) => d.Country == "DEU" && d[selectedData];
 	var xScale = d3.scaleBand().domain(data.map(xValue)).range([0, innerWidth]).padding(0.1);
 	var yScale = d3
 		.scaleLinear()
 		.domain([0, d3.max(data, yValue)])
 		.range([innerHeight, 0]);
 	const g = container.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
-	g.append("g").attr("class", "axis").style("font", "15px times").call(d3.axisLeft(yScale));
+	g.append("g").attr("class", "axis").style("font", "14px times").call(d3.axisLeft(yScale));
 	g.append("g")
 		.attr("class", "axis")
-		.style("font", "15px times")
+		.style("font", "14px times")
 		.attr("transform", `translate(0, ${innerHeight})`)
 		.call(
 			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 9) === 0))
@@ -133,14 +146,14 @@ function renderBarChart(data) {
 
 const render = (data, datavizId) => {
 	var xValue = (d) => d.date;
-	var yValue = (d) => d.new_cases;
+	var yValue = (d) => d[selectedData];
 	var xScale = d3.scaleBand().domain(data.map(xValue)).range([0, innerWidth]).padding(0.1);
 	var yScale = d3
 		.scaleLinear()
 		.domain([0, d3.max(data, yValue)])
 		.range([innerHeight, 0]);
 	//------------ second visualization ------------
-	yValue = (d) => d.new_cases;
+	yValue = (d) => d[selectedData];
 	yScale = d3
 		.scaleLinear()
 		.domain([0, d3.max(data, yValue)])
@@ -162,14 +175,14 @@ const render = (data, datavizId) => {
 		.entries(data);
 	dataviz
 		.append("g")
-		.style("font", "15px times")
+		.style("font", "14px times")
 		.attr("class", "axis")
 		.attr("transform", `translate(0, ${innerHeight})`)
 		.call(
 			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 9) === 0))
 		);
 
-	dataviz.append("g").attr("class", "axis").style("font", "15px times").call(d3.axisLeft(yScale));
+	dataviz.append("g").attr("class", "axis").style("font", "14px times").call(d3.axisLeft(yScale));
 
 	// color palette
 	var res = sumstat.map(function (d) {
@@ -217,7 +230,7 @@ const render = (data, datavizId) => {
 					return xScale(d.date);
 				})
 				.y(function (d) {
-					return yScale(d.new_cases);
+					return yScale(d[selectedData]);
 				})(d.values);
 		});
 
@@ -234,6 +247,7 @@ var csv_data2 = {};
 d3.csv("../notebooks/europe.csv").then((data) => {
 	data.forEach((d) => {
 		d.new_cases = +d.new_cases;
+		d.new_deaths = +d.new_deaths;
 	});
 	csv_data1 = data;
 	renderBarChart(data);
@@ -243,6 +257,7 @@ d3.csv("../notebooks/europe.csv").then((data) => {
 d3.csv("../notebooks/asia.csv").then((data) => {
 	data.forEach((d) => {
 		d.new_cases = +d.new_cases;
+		d.new_deaths = +d.new_deaths;
 	});
 	csv_data2 = data;
 	render(data, "#dataviz2");

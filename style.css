@@ -6,11 +6,11 @@ body {
 }
 
 .container {
-	width: 1800px;
-	height: 350px;
+	width: 1600px;
+	height: 250px;
 	border: 1px solid #858585;
 	border-radius: 10px;
-	margin: 5px;
+	margin: 2px;
 }
 
 .bar {
@@ -18,14 +18,23 @@ body {
 }
 
 input {
-	width: 1550px;
+	width: 1400px;
+}
+
+select {
+	background-color: rgb(198, 198, 198);
+	border-radius: 5px;
 }
 
 text,
-h1,
+h2,
 p,
 .axis {
 	color: rgb(198, 198, 198);
+}
+
+p {
+	font-size: 14px;
 }
 
 i {
@@ -33,7 +42,7 @@ i {
 }
 
 .sliderContainer {
-	width: 1800px;
+	width: 1600px;
 	display: flex;
 	flex-flow: row;
 	justify-content: space-between;
