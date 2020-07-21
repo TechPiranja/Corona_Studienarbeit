@@ -3,6 +3,7 @@ body {
 	display: flex;
 	flex-flow: column;
 	align-items: center;
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .container {
