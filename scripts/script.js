@@ -74,26 +74,19 @@ function changeTimeEnd(val) {
 function reRenderCharts() {
 	// löschen der alten Diagramme
 	document.getElementById("simpleBarChart").innerHTML = "";
-	document.getElementById("dataviz").innerHTML = "";
-	document.getElementById("dataviz2").innerHTML = "";
+	document.getElementById("lineCharts").innerHTML = "";
 	// new rendern der neuen Diagramme
-	renderBarChart(
-		csv_data1.filter(function (d) {
-			return new Date(d.date) <= dateMax;
-		})
-	);
-	render(
-		csv_data1.filter(function (d) {
-			return new Date(d.date) <= dateMax;
-		}),
-		"#dataviz"
-	);
-	render(
-		csv_data2.filter(function (d) {
-			return new Date(d.date) <= dateMax;
-		}),
-		"#dataviz2"
-	);
+	renderBarChart(worldData.filter((d) => d.Country == "DEU" && new Date(d.date) <= dateMax));
+
+	continents.forEach((continent, i) => {
+		let div = document.createElement("div");
+		div.setAttribute("id", "autoDataviz" + i);
+		lineCharts.appendChild(div);
+		render(
+			worldData.filter((d) => d.Continent == continent && new Date(d.date) <= dateMax),
+			"#autoDataviz" + i
+		);
+	});
 }
 
 function triggerChangeTimeEnd(val) {
@@ -176,7 +169,7 @@ const render = (data, datavizId) => {
 		.domain([0, d3.max(data, yValue)])
 		.range([innerHeight, 0]);
 
-	const dataviz = d3
+	var dataviz = d3
 		.select(datavizId)
 		.append("svg")
 		.classed("container", true)
@@ -229,7 +222,7 @@ const render = (data, datavizId) => {
 				})(d.values);
 		});
 
-	dataviz.append("g").attr("transform", `translate(1475,5)`).call(colorLegend, {
+	dataviz.append("g").attr("transform", `translate(775,5)`).call(colorLegend, {
 		colorScale,
 		circleRadius: 5,
 		spacing: 15,
@@ -237,31 +230,33 @@ const render = (data, datavizId) => {
 	});
 };
 
+var worldData = {};
+var lineCharts = document.getElementById("lineCharts");
+var continents = [];
+
 // loading data from .csv
-var csv_data1 = {};
-var csv_data2 = {};
-d3.csv("../notebooks/europe.csv").then((data) => {
+d3.csv("../notebooks/world.csv").then((data) => {
 	data.forEach((d) => {
 		d.new_cases = +d.new_cases;
 		d.new_deaths = +d.new_deaths;
+		continents.indexOf(d.Continent) === -1 ? continents.push(d.Continent) : 0;
 	});
-	csv_data1 = data;
-	renderBarChart(data);
-	render(data, "#dataviz");
+	worldData = data;
+	renderBarChart(worldData.filter((d) => d.Country == "DEU" && new Date(d.date) <= dateMax));
+	continents.forEach((continent, i) => {
+		let div = document.createElement("div");
+		div.setAttribute("id", "autoDataviz" + i);
+		lineCharts.appendChild(div);
+		render(
+			data.filter((c) => c.Continent == continent),
+			"#autoDataviz" + i
+		);
+	});
 });
 
-d3.csv("../notebooks/asia.csv").then((data) => {
-	data.forEach((d) => {
-		d.new_cases = +d.new_cases;
-		d.new_deaths = +d.new_deaths;
-	});
-	csv_data2 = data;
-	render(data, "#dataviz2");
-});
-
-const colorLegend = (selection, props) => {
+const colorLegend = (sel, props) => {
 	const { colorScale, circleRadius, spacing, textOffset } = props;
-	const groups = selection.selectAll("g").data(colorScale.domain());
+	const groups = sel.selectAll("g").data(colorScale.domain());
 	const groupsEnter = groups.enter().append("g").attr("class", "tick");
 	groupsEnter.merge(groups).attr("transform", (d, i) => `translate(0, ${i * spacing})`);
 	groups.exit().remove();
