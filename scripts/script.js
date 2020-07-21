@@ -6,6 +6,15 @@ var isPlaying = false;
 var interval;
 var playStopElement = document.getElementById("playStop");
 var selectedData = "new_cases";
+var worldData = {};
+var charts = document.getElementById("charts");
+var continents = [];
+var container = d3.select("#simpleBarChart").classed("container", true);
+var width = parseInt(container.style("width"));
+var height = parseInt(container.style("height"));
+const margin = { top: 10, right: 80, bottom: 40, left: 60 };
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
 
 window.onload = function setTimeSlider() {
 	let today = new Date();
@@ -81,7 +90,7 @@ function reRenderCharts() {
 		let div = document.createElement("div");
 		div.setAttribute("id", "autoDataviz" + i);
 		charts.appendChild(div);
-		render(
+		renderLineChart(
 			worldData.filter((d) => d.Continent == continent && new Date(d.date) <= dateMax),
 			"#autoDataviz" + i
 		);
@@ -92,13 +101,6 @@ function triggerChangeTimeEnd(val) {
 	togglePlayStopIcon(true);
 	changeTimeEnd(val);
 }
-
-var container = d3.select("#simpleBarChart").classed("container", true);
-var width = parseInt(container.style("width"));
-var height = parseInt(container.style("height"));
-const margin = { top: 10, right: 80, bottom: 40, left: 60 };
-const innerWidth = width - margin.left - margin.right;
-const innerHeight = height - margin.top - margin.bottom;
 
 function renderBarChart(data) {
 	container = d3.select("#simpleBarChart").classed("container", true);
@@ -153,9 +155,28 @@ function renderBarChart(data) {
 			tooltip.attr("transform", `translate(${xPos}, ${yPos})`);
 			tooltip.select("text").text(d.date + " : " + d[selectedData]);
 		});
+
+	// group the data: I want to draw one line per group
+	var sumstat = d3
+		.nest() // nest function allows to group the calculation per level of a factor
+		.key(function (d) {
+			return d.Country;
+		})
+		.entries(data);
+	// color palette
+	var res = sumstat.map(function (d) {
+		return d.key;
+	}); // list of group names
+	var colorScale = d3.scaleOrdinal().domain(res).range(colors);
+	container.append("g").attr("transform", `translate(830,15)`).call(colorLegend, {
+		colorScale,
+		circleRadius: 5,
+		spacing: 15,
+		textOffset: 20,
+	});
 }
 
-const render = (data, datavizId) => {
+const renderLineChart = (data, datavizId) => {
 	var xValue = (d) => d.date;
 	var yValue = (d) => d[selectedData];
 	var xScale = d3.scaleBand().domain(data.map(xValue)).range([0, innerWidth]).padding(0.1);
@@ -164,7 +185,6 @@ const render = (data, datavizId) => {
 		.domain([0, d3.max(data, yValue)])
 		.range([innerHeight, 0]);
 
-	//------------ second visualization ------------
 	yValue = (d) => d[selectedData];
 	yScale = d3
 		.scaleLinear()
@@ -178,13 +198,6 @@ const render = (data, datavizId) => {
 		.append("g")
 		.attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-	// group the data: I want to draw one line per group
-	var sumstat = d3
-		.nest() // nest function allows to group the calculation per level of a factor
-		.key(function (d) {
-			return d.Country;
-		})
-		.entries(data);
 	dataviz
 		.append("g")
 		.style("font", "14px times")
@@ -196,6 +209,13 @@ const render = (data, datavizId) => {
 
 	dataviz.append("g").attr("class", "axis").style("font", "14px times").call(d3.axisLeft(yScale));
 
+	// group the data: I want to draw one line per group
+	var sumstat = d3
+		.nest() // nest function allows to group the calculation per level of a factor
+		.key(function (d) {
+			return d.Country;
+		})
+		.entries(data);
 	// color palette
 	var res = sumstat.map(function (d) {
 		return d.key;
@@ -232,10 +252,6 @@ const render = (data, datavizId) => {
 	});
 };
 
-var worldData = {};
-var charts = document.getElementById("charts");
-var continents = [];
-
 // loading data from .csv
 d3.csv("../notebooks/world.csv").then((data) => {
 	data.forEach((d) => {
@@ -249,7 +265,7 @@ d3.csv("../notebooks/world.csv").then((data) => {
 		let div = document.createElement("div");
 		div.setAttribute("id", "autoDataviz" + i);
 		charts.appendChild(div);
-		render(
+		renderLineChart(
 			data.filter((c) => c.Continent == continent),
 			"#autoDataviz" + i
 		);
