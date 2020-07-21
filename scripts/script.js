@@ -74,13 +74,13 @@ function changeTimeEnd(val) {
 function reRenderCharts() {
 	// löschen der alten Diagramme
 	document.getElementById("simpleBarChart").innerHTML = "";
-	document.getElementById("lineCharts").innerHTML = "";
 	// new rendern der neuen Diagramme
 	renderBarChart(worldData.filter((d) => d.Country == "DEU" && new Date(d.date) <= dateMax));
 	continents.forEach((continent, i) => {
+		document.getElementById("autoDataviz" + i).innerHTML = "";
 		let div = document.createElement("div");
 		div.setAttribute("id", "autoDataviz" + i);
-		lineCharts.appendChild(div);
+		charts.appendChild(div);
 		render(
 			worldData.filter((d) => d.Continent == continent && new Date(d.date) <= dateMax),
 			"#autoDataviz" + i
@@ -93,14 +93,17 @@ function triggerChangeTimeEnd(val) {
 	changeTimeEnd(val);
 }
 
-const container = d3.select("#simpleBarChart").classed("container", true);
-const width = parseInt(container.style("width"));
-const height = parseInt(container.style("height"));
+var container = d3.select("#simpleBarChart").classed("container", true);
+var width = parseInt(container.style("width"));
+var height = parseInt(container.style("height"));
 const margin = { top: 10, right: 80, bottom: 40, left: 60 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
 
 function renderBarChart(data) {
+	container = d3.select("#simpleBarChart").classed("container", true);
+	width = parseInt(container.style("width"));
+	height = parseInt(container.style("height"));
 	var xValue = (d) => d.date;
 	var yValue = (d) => d.Country == "DEU" && d[selectedData];
 	var xScale = d3.scaleBand().domain(data.map(xValue)).range([0, innerWidth]).padding(0.1);
@@ -230,7 +233,7 @@ const render = (data, datavizId) => {
 };
 
 var worldData = {};
-var lineCharts = document.getElementById("lineCharts");
+var charts = document.getElementById("charts");
 var continents = [];
 
 // loading data from .csv
@@ -245,7 +248,7 @@ d3.csv("../notebooks/world.csv").then((data) => {
 	continents.forEach((continent, i) => {
 		let div = document.createElement("div");
 		div.setAttribute("id", "autoDataviz" + i);
-		lineCharts.appendChild(div);
+		charts.appendChild(div);
 		render(
 			data.filter((c) => c.Continent == continent),
 			"#autoDataviz" + i
@@ -271,22 +274,18 @@ const colorLegend = (sel, props) => {
 
 // Material UI Colors
 colors = [
-	"#ef5350",
 	"#ec407a",
-	"#ab47bc",
 	"#7e57c2",
 	"#5c6bc0",
-	"#42a5f5",
-	"#29b6f6",
 	"#26c6da",
 	"#26a69a",
 	"#66bb6a",
-	"#9ccc65",
-	"#d4e157",
+	"#303f9f",
 	"#ffee58",
-	"#ffca28",
 	"#ffa726",
 	"#ff7043",
 	"#8d6e63",
 	"#78909c",
+	"#ccc",
+	"#000",
 ];
