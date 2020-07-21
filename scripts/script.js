@@ -118,7 +118,7 @@ function renderBarChart(data) {
 		.style("font", "14px times")
 		.attr("transform", `translate(0, ${innerHeight})`)
 		.call(
-			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 9) === 0))
+			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 8) === 0))
 		);
 
 	var tooltip = container.append("g").style("display", "none");
@@ -191,7 +191,7 @@ const render = (data, datavizId) => {
 		.attr("class", "axis")
 		.attr("transform", `translate(0, ${innerHeight})`)
 		.call(
-			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 9) === 0))
+			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 8) === 0))
 		);
 
 	dataviz.append("g").attr("class", "axis").style("font", "14px times").call(d3.axisLeft(yScale));
