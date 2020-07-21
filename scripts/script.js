@@ -134,6 +134,20 @@ function renderBarChart(data) {
 		.attr("font-weight", "bold")
 		.style("fill", "#bbb");
 
+	// group the data: I want to draw one line per group
+	var sumstat = d3
+		.nest() // nest function allows to group the calculation per level of a factor
+		.key(function (d) {
+			return d.Country;
+		})
+		.entries(data);
+
+	// color palette
+	var res = sumstat.map(function (d) {
+		return d.key;
+	}); // list of group names
+
+	var colorScale = d3.scaleOrdinal().domain(res).range(colors);
 	g.selectAll(".bar")
 		.data(data)
 		.enter()
@@ -156,18 +170,6 @@ function renderBarChart(data) {
 			tooltip.select("text").text(d.date + " : " + d[selectedData]);
 		});
 
-	// group the data: I want to draw one line per group
-	var sumstat = d3
-		.nest() // nest function allows to group the calculation per level of a factor
-		.key(function (d) {
-			return d.Country;
-		})
-		.entries(data);
-	// color palette
-	var res = sumstat.map(function (d) {
-		return d.key;
-	}); // list of group names
-	var colorScale = d3.scaleOrdinal().domain(res).range(colors);
 	container.append("g").attr("transform", `translate(830,15)`).call(colorLegend, {
 		colorScale,
 		circleRadius: 5,
@@ -290,10 +292,10 @@ const colorLegend = (sel, props) => {
 
 // Material UI Colors
 colors = [
+	"#26c6da",
 	"#ec407a",
 	"#7e57c2",
 	"#5c6bc0",
-	"#26c6da",
 	"#26a69a",
 	"#66bb6a",
 	"#303f9f",
