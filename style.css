@@ -17,6 +17,12 @@ body {
 	fill: #ac33cb;
 }
 
+#charts {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
 input {
 	width: 700px;
 }
