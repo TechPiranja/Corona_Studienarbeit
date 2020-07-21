@@ -6,7 +6,7 @@ body {
 }
 
 .container {
-	width: 1600px;
+	width: 900px;
 	height: 250px;
 	border: 1px solid #858585;
 	border-radius: 10px;
@@ -18,7 +18,7 @@ body {
 }
 
 input {
-	width: 1400px;
+	width: 700px;
 }
 
 select {
@@ -47,7 +47,7 @@ i {
 }
 
 .sliderContainer {
-	width: 1600px;
+	width: 900px;
 	display: flex;
 	flex-flow: row;
 	justify-content: space-between;
