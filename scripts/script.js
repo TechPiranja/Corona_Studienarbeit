@@ -77,7 +77,6 @@ function reRenderCharts() {
 	document.getElementById("lineCharts").innerHTML = "";
 	// new rendern der neuen Diagramme
 	renderBarChart(worldData.filter((d) => d.Country == "DEU" && new Date(d.date) <= dateMax));
-
 	continents.forEach((continent, i) => {
 		let div = document.createElement("div");
 		div.setAttribute("id", "autoDataviz" + i);
