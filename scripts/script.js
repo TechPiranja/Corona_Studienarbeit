@@ -1,3 +1,4 @@
+// globaly used variables
 const covidStart = new Date("2019-12-31");
 var dateMax = new Date();
 var originalDiffDays = 0;
@@ -16,6 +17,7 @@ const margin = { top: 10, right: 80, bottom: 40, left: 60 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
 
+// sets timeSlider max and value, todaysDate and calculates diffDays
 window.onload = function setTimeSlider() {
 	let today = new Date();
 	today = today.getMonth() + 1 + "-" + today.getDate() + "-" + today.getFullYear();
@@ -27,11 +29,14 @@ window.onload = function setTimeSlider() {
 	document.getElementById("todaysDate").innerHTML = today;
 };
 
+/* 	invoked by dropdownmenu, changes between "new cases" or "new deaths" data
+ 	and rerenders Charts */
 function changeData(selectedObject) {
 	selectedData = selectedObject.value;
 	reRenderCharts();
 }
 
+// invoked by play-button, toggles icon and starts timeline "animation"
 function playStopDateAnimation() {
 	if (!togglePlayStopIcon()) return;
 
@@ -47,6 +52,7 @@ function playStopDateAnimation() {
 	}, 80);
 }
 
+// toggles between play and pause icons, stops running "animation" on pause
 function togglePlayStopIcon(defaultState = false) {
 	if (isPlaying || defaultState) {
 		playStopElement.classList.remove("fa-pause");
@@ -62,6 +68,7 @@ function togglePlayStopIcon(defaultState = false) {
 	return true;
 }
 
+// helper function to determine diffDays
 var date_diff_indays = function (date1, date2) {
 	dt1 = new Date(date1);
 	dt2 = new Date(date2);
@@ -72,24 +79,31 @@ var date_diff_indays = function (date1, date2) {
 	);
 };
 
+// calculates new dateMax & diffDays and reRenders all Charts
 function changeTimeEnd(val) {
-	// neues Enddatum berechnen
 	dateMax = new Date(covidStart.getTime() + parseInt(val) * 86400000);
-	// ändern des diffDays, da die x-Achse damit skaliert
+	// this change is needed, for correct x-axis scaling
 	diffDays = date_diff_indays("2019-12-31", dateMax);
 	reRenderCharts();
 }
 
+// rerendering of all charts
 function reRenderCharts() {
-	// löschen der alten Diagramme
+	// deletes outdated chart
 	document.getElementById("simpleBarChart").innerHTML = "";
-	// new rendern der neuen Diagramme
+	// render of new bar chart
 	renderBarChart(worldData.filter((d) => d.Country == "DEU" && new Date(d.date) <= dateMax));
+	// rerendering of line charts
+
 	continents.forEach((continent, i) => {
+		// deleting outdated line charts
 		document.getElementById("autoDataviz" + i).innerHTML = "";
+		// creating and appending new chart-divs
 		let div = document.createElement("div");
 		div.setAttribute("id", "autoDataviz" + i);
 		charts.appendChild(div);
+
+		// renderof new line chart
 		renderLineChart(
 			worldData.filter((d) => d.Continent == continent && new Date(d.date) <= dateMax),
 			"#autoDataviz" + i
@@ -97,15 +111,19 @@ function reRenderCharts() {
 	});
 }
 
+// can also be invoked by onInput by TimeSlider, calls methods to toggle icons and rerender
 function triggerChangeTimeEnd(val) {
 	togglePlayStopIcon(true);
 	changeTimeEnd(val);
 }
 
+// renders Bar Chart with Legend and Tooltip
 function renderBarChart(data) {
 	container = d3.select("#simpleBarChart").classed("container", true);
 	width = parseInt(container.style("width"));
 	height = parseInt(container.style("height"));
+
+	// x-axis by dates, y-axis by selected data from dropdownmenu and country = "DEU"
 	var xValue = (d) => d.date;
 	var yValue = (d) => d.Country == "DEU" && d[selectedData];
 	var xScale = d3.scaleBand().domain(data.map(xValue)).range([0, innerWidth]).padding(0.1);
@@ -113,6 +131,8 @@ function renderBarChart(data) {
 		.scaleLinear()
 		.domain([0, d3.max(data, yValue)])
 		.range([innerHeight, 0]);
+
+	// appending g for axis, using tickValues to prevent unreadability of x-axis
 	const g = container.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
 	g.append("g").attr("class", "axis").style("font", "14px times").call(d3.axisLeft(yScale));
 	g.append("g")
@@ -123,9 +143,9 @@ function renderBarChart(data) {
 			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 8) === 0))
 		);
 
+	// appending tooltip
 	var tooltip = container.append("g").style("display", "none");
 	tooltip.append("rect").attr("width", 180).attr("height", 32).attr("class", "tooltip");
-
 	tooltip
 		.append("text")
 		.attr("x", 15)
@@ -134,20 +154,19 @@ function renderBarChart(data) {
 		.attr("font-weight", "bold")
 		.style("fill", "#bbb");
 
-	// group the data: I want to draw one line per group
+	// group data by Country for color legend
 	var sumstat = d3
-		.nest() // nest function allows to group the calculation per level of a factor
-		.key(function (d) {
-			return d.Country;
-		})
+		.nest()
+		.key((d) => d.Country)
 		.entries(data);
 
-	// color palette
-	var res = sumstat.map(function (d) {
-		return d.key;
-	}); // list of group names
+	// defining count for color palette
+	var res = sumstat.map((d) => d.key);
 
+	// defining colorScale
 	var colorScale = d3.scaleOrdinal().domain(res).range(colors);
+
+	// rendering bars with tooltip functionality
 	g.selectAll(".bar")
 		.data(data)
 		.enter()
@@ -170,6 +189,7 @@ function renderBarChart(data) {
 			tooltip.select("text").text(d.date + " : " + d[selectedData]);
 		});
 
+	// appending color Legend to rigth side of bar chart
 	container.append("g").attr("transform", `translate(830,15)`).call(colorLegend, {
 		colorScale,
 		circleRadius: 5,
@@ -178,6 +198,7 @@ function renderBarChart(data) {
 	});
 }
 
+// rendering line chart with given id
 const renderLineChart = (data, datavizId) => {
 	var xValue = (d) => d.date;
 	var yValue = (d) => d[selectedData];
@@ -187,12 +208,14 @@ const renderLineChart = (data, datavizId) => {
 		.domain([0, d3.max(data, yValue)])
 		.range([innerHeight, 0]);
 
+	// y-axis for selected data (new cases or new deaths)
 	yValue = (d) => d[selectedData];
 	yScale = d3
 		.scaleLinear()
 		.domain([0, d3.max(data, yValue)])
 		.range([innerHeight, 0]);
 
+	// appending svg
 	var dataviz = d3
 		.select(datavizId)
 		.append("svg")
@@ -200,6 +223,7 @@ const renderLineChart = (data, datavizId) => {
 		.append("g")
 		.attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+	// appending axis to chart
 	dataviz
 		.append("g")
 		.style("font", "14px times")
@@ -208,23 +232,21 @@ const renderLineChart = (data, datavizId) => {
 		.call(
 			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 8) === 0))
 		);
-
 	dataviz.append("g").attr("class", "axis").style("font", "14px times").call(d3.axisLeft(yScale));
 
-	// group the data: I want to draw one line per group
+	// group data by Country for color legend
 	var sumstat = d3
-		.nest() // nest function allows to group the calculation per level of a factor
-		.key(function (d) {
-			return d.Country;
-		})
+		.nest()
+		.key((d) => d.Country)
 		.entries(data);
-	// color palette
-	var res = sumstat.map(function (d) {
-		return d.key;
-	}); // list of group names
+
+	// defining count for color palette
+	var res = sumstat.map((d) => d.key);
+
+	// defining colorScale
 	var colorScale = d3.scaleOrdinal().domain(res).range(colors);
 
-	// Draw the line
+	// draws lines
 	dataviz
 		.selectAll(".line")
 		.data(sumstat)
@@ -246,6 +268,7 @@ const renderLineChart = (data, datavizId) => {
 				})(d.values);
 		});
 
+	// appending colorlegend to right side of line chart
 	dataviz.append("g").attr("transform", `translate(775,5)`).call(colorLegend, {
 		colorScale,
 		circleRadius: 5,
@@ -256,17 +279,27 @@ const renderLineChart = (data, datavizId) => {
 
 // loading data from .csv
 d3.csv("../notebooks/world.csv").then((data) => {
+	// converting string numbers to actual numbers with +
+	// creating continents list for iteration
 	data.forEach((d) => {
 		d.new_cases = +d.new_cases;
 		d.new_deaths = +d.new_deaths;
 		continents.indexOf(d.Continent) === -1 ? continents.push(d.Continent) : 0;
 	});
+	// saving data on global var for rerendering
 	worldData = data;
+
+	// renders bar chart
 	renderBarChart(worldData.filter((d) => d.Country == "DEU" && new Date(d.date) <= dateMax));
+
+	// renders line chart for each continent
 	continents.forEach((continent, i) => {
+		// creating and appending div for each continent
 		let div = document.createElement("div");
 		div.setAttribute("id", "autoDataviz" + i);
 		charts.appendChild(div);
+
+		// rendering line chart with id created by index
 		renderLineChart(
 			data.filter((c) => c.Continent == continent),
 			"#autoDataviz" + i
@@ -274,6 +307,7 @@ d3.csv("../notebooks/world.csv").then((data) => {
 	});
 });
 
+// colorlegend helper
 const colorLegend = (sel, props) => {
 	const { colorScale, circleRadius, spacing, textOffset } = props;
 	const groups = sel.selectAll("g").data(colorScale.domain());
