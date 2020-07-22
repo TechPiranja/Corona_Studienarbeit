@@ -13,7 +13,7 @@ var continents = [];
 var container = d3.select("#simpleBarChart").classed("container", true);
 var width = parseInt(container.style("width"));
 var height = parseInt(container.style("height"));
-const margin = { top: 10, right: 80, bottom: 40, left: 60 };
+const margin = { top: 10, right: 100, bottom: 40, left: 55 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
 
@@ -140,7 +140,7 @@ function renderBarChart(data) {
 		.style("font", "14px times")
 		.attr("transform", `translate(0, ${innerHeight})`)
 		.call(
-			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 8) === 0))
+			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 5) === 0))
 		);
 
 	// appending tooltip
@@ -190,7 +190,7 @@ function renderBarChart(data) {
 		});
 
 	// appending color Legend to rigth side of bar chart
-	container.append("g").attr("transform", `translate(830,15)`).call(colorLegend, {
+	container.append("g").attr("transform", `translate(560,15)`).call(colorLegend, {
 		colorScale,
 		circleRadius: 5,
 		spacing: 15,
@@ -230,7 +230,7 @@ const renderLineChart = (data, datavizId) => {
 		.attr("class", "axis")
 		.attr("transform", `translate(0, ${innerHeight})`)
 		.call(
-			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 8) === 0))
+			d3.axisBottom(xScale).tickValues(xScale.domain().filter((d, i) => i % d3.format(".1")(diffDays / 5) === 0))
 		);
 	dataviz.append("g").attr("class", "axis").style("font", "14px times").call(d3.axisLeft(yScale));
 
@@ -269,7 +269,7 @@ const renderLineChart = (data, datavizId) => {
 		});
 
 	// appending colorlegend to right side of line chart
-	dataviz.append("g").attr("transform", `translate(775,5)`).call(colorLegend, {
+	dataviz.append("g").attr("transform", `translate(500,5)`).call(colorLegend, {
 		colorScale,
 		circleRadius: 5,
 		spacing: 15,

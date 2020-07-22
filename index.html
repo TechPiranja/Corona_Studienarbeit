@@ -8,23 +8,27 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
 	</head>
 	<body>
-		<h2>Corona-WorldChart</h2>
-		<p>Bar-Chart from German Data, Line-Charts for each Continent with full Data</p>
-		<select onchange="changeData(this)">
-			<option value="new_cases">new cases</option>
-			<option value="new_deaths">new deaths</option>
-		</select>
-		<div id="charts">
-			<svg id="simpleBarChart"></svg>
+		<div class="centerContainer">
+			<div class="rowContainer">
+				<p>change y-axis data:</p>
+				<select onchange="changeData(this)">
+					<option value="new_cases">new cases</option>
+					<option value="new_deaths">new deaths</option>
+				</select>
+			</div>
+			<div id="charts">
+				<svg id="simpleBarChart"></svg>
+			</div>
+			<div class="sliderContainer">
+				<button onclick="playStopDateAnimation()">
+					<i id="playStop" class="fa fa-play" aria-hidden="true" style="font-size: 1.75em;"></i>
+				</button>
+				<p>12-31-2019</p>
+				<input id="timeSlider" type="range" min="1" oninput="triggerChangeTimeEnd(this.value)" />
+				<p id="todaysDate"></p>
+			</div>
 		</div>
-		<div class="sliderContainer">
-			<button onclick="playStopDateAnimation()">
-				<i id="playStop" class="fa fa-play" aria-hidden="true" style="font-size: 1.75em;"></i>
-			</button>
-			<p>12-31-2019</p>
-			<input id="timeSlider" type="range" min="1" oninput="triggerChangeTimeEnd(this.value)" />
-			<p id="todaysDate"></p>
-		</div>
+
 		<script type="text/javascript" src="scripts/d3.min.js"></script>
 		<script type="text/javascript" src="scripts/script.js"></script>
 		<noscript>
