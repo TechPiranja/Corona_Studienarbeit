@@ -266,7 +266,30 @@ const renderLineChart = (data, datavizId) => {
 				.y(function (d) {
 					return yScale(d[selectedData]);
 				})(d.values);
+		})
+		.on("mouseover", function () {
+			tooltip.style("display", null);
+		})
+		.on("mouseout", function () {
+			tooltip.style("display", "none");
+		})
+		.on("mousemove", function (d) {
+			var xPos = d3.mouse(this)[0] - 15;
+			var yPos = d3.mouse(this)[1] - 55;
+			tooltip.attr("transform", `translate(${xPos}, ${yPos})`);
+			tooltip.select("text").text(d.key);
 		});
+
+	// appending tooltip
+	var tooltip = dataviz.append("g").style("display", "none");
+	tooltip.append("rect").attr("width", 180).attr("height", 32).attr("class", "tooltip");
+	tooltip
+		.append("text")
+		.attr("x", 15)
+		.attr("dy", "1.2em")
+		.style("font-size", "1.25em")
+		.attr("font-weight", "bold")
+		.style("fill", "#bbb");
 
 	// appending colorlegend to right side of line chart
 	dataviz.append("g").attr("transform", `translate(500,5)`).call(colorLegend, {
