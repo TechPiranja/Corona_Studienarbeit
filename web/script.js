@@ -278,7 +278,7 @@ const renderLineChart = (data, datavizId) => {
 };
 
 // loading data from .csv
-d3.csv("../notebooks/world.csv").then((data) => {
+d3.csv("./data/world.csv").then((data) => {
 	// converting string numbers to actual numbers with +
 	// creating continents list for iteration
 	data.forEach((d) => {
